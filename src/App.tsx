@@ -1024,7 +1024,7 @@ export default function App() {
               {/* Two Color UI Previews */}
               <div>
                 <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Combination Previews</h2>
-                <TwoColorUIPreviews p1={palette} p2={palette2} />
+                <UIPreviews p1={palette} p2={palette2} />
               </div>
             </div>
           )}
