@@ -184,7 +184,6 @@ function TwoColorUIPreviews({ p1, p2 }: { p1: Record<number, string>, p2: Record
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" style={cssVars}>
-      {/* Card 1: Dashboard */}
       <div className="bg-white dark:bg-slate-900 p-6 rounded-md border border-slate-200 dark:border-slate-800 shadow-sm">
         <div className="flex justify-between items-start mb-6">
           <h3 className="text-lg font-bold text-slate-900 dark:text-white">Overview</h3>
@@ -201,7 +200,6 @@ function TwoColorUIPreviews({ p1, p2 }: { p1: Record<number, string>, p2: Record
         <button className="w-full mt-6 bg-[var(--p1-500)] text-white py-2 rounded-md text-sm font-semibold">Action</button>
       </div>
 
-      {/* Card 2: Stats */}
       <div className="bg-[var(--p1-900)] p-6 rounded-md shadow-sm text-white flex flex-col justify-between">
         <p className="text-[var(--p1-100)] text-sm font-medium">Total Revenue</p>
         <h3 className="text-3xl font-bold mt-2 mb-6">$124,500</h3>
@@ -210,7 +208,6 @@ function TwoColorUIPreviews({ p1, p2 }: { p1: Record<number, string>, p2: Record
         </div>
       </div>
 
-      {/* Card 3: Alert */}
       <div className="bg-[var(--p2-50)] dark:bg-[var(--p2-900)]/20 border border-[var(--p2-200)] dark:border-[var(--p2-800)] p-6 rounded-md shadow-sm">
         <div className="flex items-start gap-3">
           <AlertTriangle className="text-[var(--p2-600)] dark:text-[var(--p2-400)] shrink-0" size={20} />
@@ -628,9 +625,61 @@ export default function App() {
   const [customGradC1, setCustomGradC1] = useState('#3b82f6');
   const [customGradC2, setCustomGradC2] = useState('#8b5cf6');
   const [gradDir, setGradDir] = useState('to right');
-  const [gradShape, setGradShape] = useState('linear'); // linear, radial, random
+  const [gradShape, setGradShape] = useState('linear'); 
   const [copiedGradCode, setCopiedGradCode] = useState(false);
   const [showGradCode, setShowGradCode] = useState(false);
+
+  // Modal States
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [feedbackStatus, setFeedbackStatus] = useState<'idle' | 'sending' | 'success'>('idle');
+
+  const handleFeedbackSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setFeedbackStatus('sending');
+    const target = e.target as typeof e.target & {
+      name: { value: string };
+      email: { value: string };
+      message: { value: string };
+      reset: () => void;
+    };
+
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          access_key: "54b9e182-c59a-4c8d-8159-04799aa0bbfe",
+          name: target.name.value,
+          email: target.email.value,
+          message: target.message.value,
+          subject: "New Feedback from ColorGen!",
+          from_name: "ColorGen App"
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setFeedbackStatus('success');
+        setTimeout(() => {
+          setShowFeedbackModal(false);
+          setFeedbackStatus('idle');
+          target.reset();
+        }, 2000);
+      } else {
+        console.error("Submission failed", result);
+        setFeedbackStatus('idle');
+        alert("Something went wrong. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error submitting form", error);
+      setFeedbackStatus('idle');
+      alert("Network error. Please try again.");
+    }
+  };
 
   useEffect(() => {
     const randomHex = chroma.random().hex();
@@ -642,11 +691,11 @@ export default function App() {
     const p = generatePalette(activeColor);
     if (p) {
       setPalette(p);
-      document.documentElement.style.setProperty('--logo-shade-700', p[700]);
-      document.documentElement.style.setProperty('--logo-shade-600', p[600]);
-      document.documentElement.style.setProperty('--logo-shade-500', p[500]);
-      document.documentElement.style.setProperty('--logo-shade-400', p[400]);
+      document.documentElement.style.setProperty('--logo-shade-200', p[200]);
       document.documentElement.style.setProperty('--logo-shade-300', p[300]);
+      document.documentElement.style.setProperty('--logo-shade-500', p[500]);
+      document.documentElement.style.setProperty('--logo-shade-700', p[700]);
+      document.documentElement.style.setProperty('--logo-shade-800', p[800]);
     }
   }, [activeColor]);
 
@@ -660,10 +709,10 @@ export default function App() {
   useEffect(() => {
     if (isDark) {
       document.documentElement.classList.add('dark');
-      document.body.style.backgroundColor = '#020617'; // slate-950
+      document.body.style.backgroundColor = '#020617'; 
     } else {
       document.documentElement.classList.remove('dark');
-      document.body.style.backgroundColor = '#f8fafc'; // slate-50
+      document.body.style.backgroundColor = '#f8fafc'; 
     }
   }, [isDark]);
 
@@ -692,17 +741,17 @@ export default function App() {
         {/* Sidebar (Left) */}
         <div className="w-full lg:w-72 shrink-0 flex flex-col gap-8 lg:sticky lg:top-12 lg:h-[calc(100vh-6rem)] overflow-y-auto pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           <div className="flex-shrink-0">
-            <div className="flex items-center gap-3 mb-2">
-              <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
-                <rect x="4" y="4" width="24" height="4" rx="2" fill="var(--logo-shade-300)" />
-                <rect x="4" y="9" width="24" height="4" rx="2" fill="var(--logo-shade-400)" />
+            <div className="flex items-center gap-1.5 mb-2">
+              <svg width="48" height="48" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
+                <rect x="4" y="4" width="24" height="4" rx="2" fill="var(--logo-shade-200)" />
+                <rect x="4" y="9" width="24" height="4" rx="2" fill="var(--logo-shade-300)" />
                 <rect x="4" y="14" width="24" height="4" rx="2" fill="var(--logo-shade-500)" />
-                <rect x="4" y="19" width="24" height="4" rx="2" fill="var(--logo-shade-600)" />
-                <rect x="4" y="24" width="24" height="4" rx="2" fill="var(--logo-shade-700)" />
+                <rect x="4" y="19" width="24" height="4" rx="2" fill="var(--logo-shade-700)" />
+                <rect x="4" y="24" width="24" height="4" rx="2" fill="var(--logo-shade-800)" />
               </svg>
-              <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight" style={{ fontFamily: 'Sora, sans-serif' }}>ColorGen</h1>
+              <h1 className="text-[28px] leading-none font-bold tracking-tight" style={{ fontFamily: 'Sora, sans-serif', color: isDark ? '#ffffff' : '#0b1621' }}>ColorGen</h1>
             </div>
-            <p className="text-sm font-medium text-slate-500 mt-1">Design systems made simple and accessible.</p>
+            <p className="text-sm font-medium text-slate-500 mt-1">Color systems made simple and accessible.</p>
           </div>
 
           <div className="space-y-5">
@@ -806,7 +855,8 @@ export default function App() {
             {/* Tailwind Colors */}
             <div className="pt-4 border-t border-slate-200 dark:border-slate-800">
               <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">Tailwind Colors</label>
-              <div className="grid grid-cols-6 gap-1.5">
+              {/* Removed -mx-1 and added pl-1 to shift the block to the right */}
+              <div className="flex flex-wrap gap-1.5 py-1 pl-1">
                 {tailwindColors.map(tc => (
                   <button
                     key={tc.name}
@@ -814,10 +864,10 @@ export default function App() {
                       setDraftColor(tc.hex);
                       setActiveColor('#' + tc.hex);
                     }}
-                    className="w-full aspect-square rounded-md shadow-sm border border-black/5 dark:border-white/5 transition-transform hover:scale-110"
+                    className="w-7 h-7 rounded-md shadow-sm border border-black/5 dark:border-white/5 transition-transform hover:scale-110 relative hover:z-10 cursor-pointer"
                     style={{ backgroundColor: '#' + tc.hex }}
                     title={tc.name}
-                  />
+                  ></button>
                 ))}
               </div>
             </div>
@@ -878,7 +928,7 @@ export default function App() {
                     const hex = palette[shade];
                     const textColor = getContrastColor(hex);
                     const isCopied = copiedSwatch?.shade === shade && copiedSwatch?.pid === 'main';
-                    const isBase = activeColor && chroma(hex).hex() === chroma(activeColor).hex();
+                    const isBase = chroma(hex).hex() === chroma(activeColor).hex();
 
                     return (
                       <div
@@ -974,7 +1024,7 @@ export default function App() {
               {/* Two Color UI Previews */}
               <div>
                 <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Combination Previews</h2>
-                <UIPreviews p1={palette} p2={palette2} />
+                <TwoColorUIPreviews p1={palette} p2={palette2} />
               </div>
             </div>
           )}
@@ -1267,7 +1317,7 @@ export default function App() {
             </p>
             <div className="flex flex-wrap justify-center gap-3 mt-2">
               <a
-                href="https://paypal.me/yourusername"
+                href="https://paypal.me/colorgenai"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-4 py-2 bg-[#0070ba] hover:bg-[#003087] text-white rounded-lg text-sm font-semibold transition-colors shadow-sm"
@@ -1276,7 +1326,7 @@ export default function App() {
                 Support via PayPal
               </a>
               <a
-                href="https://buymeacoffee.com/yourusername"
+                href="https://buymeacoffee.com/colorgen"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-4 py-2 bg-[#FFDD00] hover:bg-[#FFDD00]/90 text-slate-900 rounded-lg text-sm font-semibold transition-colors shadow-sm"
@@ -1286,19 +1336,70 @@ export default function App() {
               </a>
             </div>
             <div className="flex justify-center mt-3">
-              <a
-                href="mailto:jun.chunhui@gmail.com?subject=Feedback for ColorGen"
+              <button
+                onClick={() => setShowFeedbackModal(true)}
                 className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-semibold transition-colors shadow-sm"
               >
                 <MessageSquare size={16} />
                 Feedback
-              </a>
+              </button>
             </div>
           </div>
           <div className="w-16 h-px bg-slate-200 dark:bg-slate-800 my-2"></div>
           <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">ColorGen © 2026</p>
         </div>
       </footer>
+
+      {/* Feedback Modal */}
+      {showFeedbackModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-md p-6 border border-slate-200 dark:border-slate-800 relative">
+            <button
+              onClick={() => setShowFeedbackModal(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-pointer"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+            
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Send Feedback</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Found a bug or have a feature request? Let me know!</p>
+            
+            <form onSubmit={handleFeedbackSubmit} className="space-y-4">
+              <div>
+                <label htmlFor="name" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Name</label>
+                <input required type="text" id="name" name="name" className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--p-500)] focus:border-transparent transition-all" style={{ '--p-500': palette?.[500] || '#0f4c81' } as React.CSSProperties} />
+              </div>
+              <div>
+                <label htmlFor="email" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Email</label>
+                <input required type="email" id="email" name="email" className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--p-500)] focus:border-transparent transition-all" style={{ '--p-500': palette?.[500] || '#0f4c81' } as React.CSSProperties} />
+              </div>
+              <div>
+                <label htmlFor="message" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Message</label>
+                <textarea required id="message" name="message" rows={4} className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--p-500)] focus:border-transparent transition-all resize-none" style={{ '--p-500': palette?.[500] || '#0f4c81' } as React.CSSProperties}></textarea>
+              </div>
+              <button
+                type="submit"
+                disabled={feedbackStatus !== 'idle'}
+                className="w-full py-2.5 rounded-lg text-sm font-bold text-white shadow-sm transition-all disabled:opacity-70 flex justify-center items-center cursor-pointer"
+                style={{ backgroundColor: palette?.[500] || '#0f4c81' }}
+              >
+                {feedbackStatus === 'idle' && 'Send Message'}
+                {feedbackStatus === 'sending' && (
+                  <span className="flex items-center gap-2">
+                    <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    Sending...
+                  </span>
+                )}
+                {feedbackStatus === 'success' && (
+                  <span className="flex items-center gap-2">
+                    <CheckCircle2 size={16} /> Sent!
+                  </span>
+                )}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
