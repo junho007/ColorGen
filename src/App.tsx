@@ -1317,15 +1317,6 @@ export default function App() {
             </p>
             <div className="flex flex-wrap justify-center gap-3 mt-2">
               <a
-                href="https://paypal.me/colorgenai"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-[#0070ba] hover:bg-[#003087] text-white rounded-lg text-sm font-semibold transition-colors shadow-sm"
-              >
-                <Coffee size={16} />
-                Support via PayPal
-              </a>
-              <a
                 href="https://buymeacoffee.com/colorgen"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -1334,8 +1325,6 @@ export default function App() {
                 <Coffee size={16} />
                 Buy me a coffee
               </a>
-            </div>
-            <div className="flex justify-center mt-3">
               <button
                 onClick={() => setShowFeedbackModal(true)}
                 className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-semibold transition-colors shadow-sm"
