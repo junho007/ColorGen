@@ -1,6 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import chroma from 'chroma-js';
-import { Check, Shuffle, Moon, Sun, CreditCard, ArrowUpRight, ArrowDownRight, Activity, Bell, Settings, PieChart, Palette, Send, CheckCircle2, Search, ChevronLeft, ChevronRight, UploadCloud, MoreHorizontal, Star, Info, Copy, ChevronDown, ChevronUp, Sparkles, AlertTriangle, Coffee, MessageSquare } from 'lucide-react';
+import { Check, Shuffle, Moon, Sun, CreditCard, ArrowUpRight, ArrowDownRight, Activity, Bell, Settings, PieChart, Palette, Send, CheckCircle2, Search, ChevronLeft, ChevronRight, UploadCloud, MoreHorizontal, Star, Info, Copy, ChevronDown, ChevronUp, Sparkles, AlertTriangle, Coffee, MessageSquare, Download, LayoutTemplate } from 'lucide-react';
+import * as htmlToImage from 'html-to-image';
+import MeshGradient from './components/MeshGradient';
+
+const ASPECT_RATIOS = [
+  { label: '16:9 Desktop', value: 'aspect-video w-full max-w-4xl' },
+  { label: '1:1 Square', value: 'aspect-square w-full max-w-lg' },
+  { label: '4:3 Standard', value: 'aspect-[4/3] w-full max-w-2xl' },
+  { label: '9:16 Mobile', value: 'aspect-[9/16] h-[500px] max-w-sm' },
+];
 
 const shades = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
 
@@ -479,7 +488,7 @@ function UIPreviews({ p1, p2 }: { p1: Record<number, string>, p2?: Record<number
           </div>
         </div>
         <div className="flex gap-2 relative">
-          <input type="text" placeholder="Type a message..." className="flex-1 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-[var(--s-500)] focus:ring-1 focus:ring-[var(--s-500)]" data-shade={p2 ? "focus: Sec 500" : "focus: 500"} data-hex={p2 ? p2[500] : p1[500]} />
+          <input type="text" placeholder="Type a message..." className="flex-1 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--s-500)]" data-shade={p2 ? "focus: Sec 500" : "focus: 500"} data-hex={p2 ? p2[500] : p1[500]} />
           <button className="w-9 h-9 rounded-full bg-[var(--s-500)] text-white flex items-center justify-center transition-colors shrink-0 shadow-sm" data-shade={p2 ? "bg: Sec 500" : "bg: 500"} data-hex={p2 ? p2[500] : p1[500]}>
             <Send size={14} className="ml-0.5" />
           </button>
@@ -521,7 +530,7 @@ function UIPreviews({ p1, p2 }: { p1: Record<number, string>, p2?: Record<number
           <h4 className="text-sm font-semibold text-slate-900 dark:text-white">Recent Orders</h4>
           <div className="relative">
             <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input type="text" placeholder="Search..." className="pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-md text-xs focus:outline-none focus:border-[var(--s-500)] focus:ring-1 focus:ring-[var(--s-500)]" data-shade={p2 ? "focus: Sec 500" : "focus: 500"} data-hex={p2 ? p2[500] : p1[500]} />
+            <input type="text" placeholder="Search..." className="pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-md text-xs focus:outline-none focus:ring-1 focus:ring-[var(--s-500)]" data-shade={p2 ? "focus: Sec 500" : "focus: 500"} data-hex={p2 ? p2[500] : p1[500]} />
           </div>
         </div>
         <div className="overflow-x-auto">
@@ -613,7 +622,7 @@ export default function App() {
   const [isDark, setIsDark] = useState(false);
 
   // New states
-  const [activeTab, setActiveTab] = useState<'palette' | 'combination' | 'gradient' | 'wcag'>('palette');
+  const [activeTab, setActiveTab] = useState<'palette' | 'combination' | 'gradient' | 'mesh' | 'wcag'>('palette');
   
   const [color2Draft, setColor2Draft] = useState('');
   const [color2, setColor2] = useState('');
@@ -628,6 +637,25 @@ export default function App() {
   const [gradShape, setGradShape] = useState('linear'); 
   const [copiedGradCode, setCopiedGradCode] = useState(false);
   const [showGradCode, setShowGradCode] = useState(false);
+  const [gradAspectRatio, setGradAspectRatio] = useState(ASPECT_RATIOS[0].value);
+  const gradPreviewRef = useRef<HTMLDivElement>(null);
+
+  const handleGradDownload = async () => {
+    if (!gradPreviewRef.current) return;
+    try {
+      const dataUrl = await htmlToImage.toPng(gradPreviewRef.current, {
+        pixelRatio: 3,
+        quality: 1.0,
+        skipFonts: true,
+      });
+      const link = document.createElement('a');
+      link.download = `gradient-${Date.now()}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      console.error('Failed to download image', err);
+    }
+  };
 
   // Modal States
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
@@ -696,6 +724,8 @@ export default function App() {
       document.documentElement.style.setProperty('--logo-shade-500', p[500]);
       document.documentElement.style.setProperty('--logo-shade-700', p[700]);
       document.documentElement.style.setProperty('--logo-shade-800', p[800]);
+      document.documentElement.style.setProperty('--p-500', p[500]);
+      document.documentElement.style.setProperty('--p-600', p[600]);
     }
   }, [activeColor]);
 
@@ -735,7 +765,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 transition-colors duration-200">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 transition-colors duration-200 selection:bg-[var(--p-500)] selection:text-white">
       <div className="max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12 flex flex-col lg:flex-row gap-8 lg:gap-12">
         
         {/* Sidebar (Left) */}
@@ -749,9 +779,9 @@ export default function App() {
                 <rect x="4" y="19" width="24" height="4" rx="2" fill="var(--logo-shade-700)" />
                 <rect x="4" y="24" width="24" height="4" rx="2" fill="var(--logo-shade-800)" />
               </svg>
-              <h1 className="text-[28px] leading-none font-bold tracking-tight" style={{ fontFamily: 'Sora, sans-serif', color: isDark ? '#ffffff' : '#0b1621' }}>ColorGen</h1>
+              <h1 className="text-[28px] leading-none font-bold tracking-tight text-[var(--p-500)]" style={{ fontFamily: 'Sora, sans-serif' }}>ColorGen</h1>
             </div>
-            <p className="text-sm font-medium text-slate-500 mt-1">Color systems made simple and accessible.</p>
+            <p className="text-sm font-medium text-slate-500 mt-1"> Color systems made simple and accessible.</p>
           </div>
 
           <div className="space-y-5">
@@ -771,7 +801,7 @@ export default function App() {
                       setActiveColor('#' + val);
                     }
                   }}
-                  className="block w-full pl-8 pr-12 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-md focus:ring-1 focus:ring-[var(--p-500)] focus:border-[var(--p-500)] text-base font-mono uppercase transition-all outline-none text-slate-900 dark:text-white shadow-sm"
+                  className="block w-full pl-8 pr-12 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-md focus:ring-1 focus:ring-inset focus:ring-[var(--p-500)] focus:border-[var(--p-500)] text-base font-mono uppercase transition-all outline-none text-slate-900 dark:text-white shadow-sm"
                   placeholder="0F4C81"
                   style={{ '--p-500': palette?.[500] || '#0f4c81' } as React.CSSProperties}
                 />
@@ -810,7 +840,7 @@ export default function App() {
                         setColor2('#' + val);
                       }
                     }}
-                    className="block w-full pl-8 pr-12 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-md focus:ring-1 focus:ring-[var(--p-500)] focus:border-[var(--p-500)] text-base font-mono uppercase transition-all outline-none text-slate-900 dark:text-white shadow-sm"
+                    className="block w-full pl-8 pr-12 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-md focus:ring-1 focus:ring-inset focus:ring-[var(--p-500)] focus:border-[var(--p-500)] text-base font-mono uppercase transition-all outline-none text-slate-900 dark:text-white shadow-sm"
                     placeholder="8B5CF6"
                     style={{ '--p-500': palette2?.[500] || '#8b5cf6' } as React.CSSProperties}
                   />
@@ -903,6 +933,7 @@ export default function App() {
               { id: 'palette', label: 'Color Palette' },
               { id: 'combination', label: 'Color Combination' },
               { id: 'gradient', label: 'Gradient Builder' },
+              { id: 'mesh', label: 'Mesh Gradient' },
               { id: 'wcag', label: 'WCAG Accessibility' }
             ].map(tab => (
               <button
@@ -984,7 +1015,7 @@ export default function App() {
                           setColor2('#' + val);
                         }
                       }}
-                      className="w-32 pl-7 pr-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus:ring-1 focus:ring-[var(--p-500)] focus:border-[var(--p-500)] text-sm font-mono uppercase outline-none text-slate-900 dark:text-white"
+                      className="w-32 pl-7 pr-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md focus:ring-1 focus:ring-inset focus:ring-[var(--p-500)] focus:border-[var(--p-500)] text-sm font-mono uppercase outline-none text-slate-900 dark:text-white"
                       style={{ '--p-500': palette2[500] } as React.CSSProperties}
                     />
                   </div>
@@ -1034,6 +1065,15 @@ export default function App() {
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-8">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-bold text-slate-900 dark:text-white">Advanced Gradient Builder</h2>
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    onClick={handleGradDownload}
+                    className="flex items-center gap-2 px-4 py-2 bg-[var(--p-500)] hover:bg-[var(--p-600)] text-white text-sm font-medium rounded-lg transition-colors shadow-sm"
+                  >
+                    <Download className="w-4 h-4" />
+                    Download PNG
+                  </button>
+                </div>
               </div>
 
               <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col lg:flex-row gap-8">
@@ -1173,6 +1213,26 @@ export default function App() {
                       </div>
                     </div>
                   )}
+
+                  {/* Aspect Ratio */}
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Aspect Ratio</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {ASPECT_RATIOS.map((ratio) => (
+                        <button
+                          key={ratio.value}
+                          onClick={() => setGradAspectRatio(ratio.value)}
+                          className={`px-3 py-2 text-xs font-medium rounded-lg border transition-colors ${
+                            gradAspectRatio === ratio.value
+                              ? 'bg-[var(--p-500)] border-[var(--p-500)] text-white'
+                              : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-700'
+                          }`}
+                        >
+                          {ratio.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
 
                 {/* Preview & Code */}
@@ -1206,10 +1266,13 @@ export default function App() {
 
                     return (
                       <>
-                        <div 
-                          className="w-full h-64 sm:h-80 rounded-2xl shadow-inner border border-slate-200/50 dark:border-slate-700/50 transition-all duration-300"
-                          style={{ backgroundImage: cssGradient }}
-                        />
+                        <div className="flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900/50 rounded-3xl p-4 border border-slate-200 dark:border-slate-800">
+                          <div 
+                            ref={gradPreviewRef}
+                            className={`rounded-2xl shadow-inner border border-slate-200/50 dark:border-slate-700/50 transition-all duration-300 ${gradAspectRatio}`}
+                            style={{ backgroundImage: cssGradient }}
+                          />
+                        </div>
                         
                         <div className="bg-slate-900 rounded-xl shadow-lg overflow-hidden border border-slate-800">
                           <button 
@@ -1275,7 +1338,12 @@ export default function App() {
             </div>
           )}
 
-          {/* Tab 4: WCAG Accessibility */}
+          {/* Tab 4: Mesh Gradient */}
+          {activeTab === 'mesh' && (
+            <MeshGradient />
+          )}
+
+          {/* Tab 6: WCAG Accessibility */}
           {activeTab === 'wcag' && palette && palette2 && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-10">
               <div className="flex items-start justify-between bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/50 p-6 rounded-2xl">
@@ -1356,21 +1424,20 @@ export default function App() {
             <form onSubmit={handleFeedbackSubmit} className="space-y-4">
               <div>
                 <label htmlFor="name" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Name</label>
-                <input required type="text" id="name" name="name" className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--p-500)] focus:border-transparent transition-all" style={{ '--p-500': palette?.[500] || '#0f4c81' } as React.CSSProperties} />
+                <input required type="text" id="name" name="name" className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-inset focus:ring-[var(--p-500)] focus:border-transparent transition-all" style={{ '--p-500': palette?.[500] || '#0f4c81' } as React.CSSProperties} />
               </div>
               <div>
                 <label htmlFor="email" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Email</label>
-                <input required type="email" id="email" name="email" className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--p-500)] focus:border-transparent transition-all" style={{ '--p-500': palette?.[500] || '#0f4c81' } as React.CSSProperties} />
+                <input required type="email" id="email" name="email" className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-inset focus:ring-[var(--p-500)] focus:border-transparent transition-all" style={{ '--p-500': palette?.[500] || '#0f4c81' } as React.CSSProperties} />
               </div>
               <div>
                 <label htmlFor="message" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Message</label>
-                <textarea required id="message" name="message" rows={4} className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--p-500)] focus:border-transparent transition-all resize-none" style={{ '--p-500': palette?.[500] || '#0f4c81' } as React.CSSProperties}></textarea>
+                <textarea required id="message" name="message" rows={4} className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-inset focus:ring-[var(--p-500)] focus:border-transparent transition-all resize-none" style={{ '--p-500': palette?.[500] || '#0f4c81' } as React.CSSProperties}></textarea>
               </div>
               <button
                 type="submit"
                 disabled={feedbackStatus !== 'idle'}
-                className="w-full py-2.5 rounded-lg text-sm font-bold text-white shadow-sm transition-all disabled:opacity-70 flex justify-center items-center cursor-pointer"
-                style={{ backgroundColor: palette?.[500] || '#0f4c81' }}
+                className="w-full py-2.5 rounded-lg text-sm font-bold text-white shadow-sm transition-all disabled:opacity-70 flex justify-center items-center cursor-pointer bg-[var(--p-500)] hover:bg-[var(--p-600)]"
               >
                 {feedbackStatus === 'idle' && 'Send Message'}
                 {feedbackStatus === 'sending' && (
