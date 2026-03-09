@@ -773,14 +773,14 @@ export default function App() {
         {/* Sidebar (Left) */}
         <div className="w-full lg:w-72 shrink-0 flex flex-col gap-8 lg:sticky lg:top-12 lg:h-[calc(100vh-6rem)] overflow-y-auto pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           <div className="flex-shrink-0">
-            <div className="flex items-center gap-0.5 mb-2">
+            <div className="flex items-center mb-2">
               <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-14 h-14 shrink-0">
-                <rect x="14" y="14" width="24" height="24" rx="8" fill="var(--logo-shade-200)" opacity="0.4"/>
-                <rect x="26" y="26" width="24" height="24" rx="8" fill="var(--logo-shade-700)"/>
-                <circle cx="20" cy="44" r="4" fill="var(--logo-shade-400)" opacity="0.8"/>
-                <circle cx="44" cy="20" r="4" fill="var(--logo-shade-600)" opacity="0.8"/>
+                <rect x="14" y="14" width="24" height="24" rx="8" fill="var(--logo-shade-200)"/>
+                <rect x="26" y="26" width="24" height="24" rx="8" fill="var(--logo-shade-600)"/>
+                <circle cx="20" cy="44" r="4" fill="var(--logo-shade-400)"/>
+                <circle cx="44" cy="20" r="4" fill="var(--logo-shade-400)"/>
               </svg>
-              <h1 className="text-[28px] leading-none font-bold tracking-tight text-[var(--p-500)]" style={{ fontFamily: 'Sora, sans-serif' }}>ColorGen</h1>
+              <h1 className="-ml-1 text-[28px] leading-none font-bold tracking-tight text-[var(--p-500)]" style={{ fontFamily: 'Sora, sans-serif' }}>ColorGen</h1>
             </div>
             <p className="text-sm font-medium text-slate-500 mt-1"> Color systems made simple and accessible.</p>
           </div>
