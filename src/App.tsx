@@ -721,7 +721,9 @@ export default function App() {
       setPalette(p);
       document.documentElement.style.setProperty('--logo-shade-200', p[200]);
       document.documentElement.style.setProperty('--logo-shade-300', p[300]);
+      document.documentElement.style.setProperty('--logo-shade-400', p[400]);
       document.documentElement.style.setProperty('--logo-shade-500', p[500]);
+      document.documentElement.style.setProperty('--logo-shade-600', p[600]);
       document.documentElement.style.setProperty('--logo-shade-700', p[700]);
       document.documentElement.style.setProperty('--logo-shade-800', p[800]);
       document.documentElement.style.setProperty('--p-500', p[500]);
@@ -771,13 +773,12 @@ export default function App() {
         {/* Sidebar (Left) */}
         <div className="w-full lg:w-72 shrink-0 flex flex-col gap-8 lg:sticky lg:top-12 lg:h-[calc(100vh-6rem)] overflow-y-auto pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           <div className="flex-shrink-0">
-            <div className="flex items-center gap-1.5 mb-2">
-              <svg width="48" height="48" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
-                <rect x="4" y="4" width="24" height="4" rx="2" fill="var(--logo-shade-200)" />
-                <rect x="4" y="9" width="24" height="4" rx="2" fill="var(--logo-shade-300)" />
-                <rect x="4" y="14" width="24" height="4" rx="2" fill="var(--logo-shade-500)" />
-                <rect x="4" y="19" width="24" height="4" rx="2" fill="var(--logo-shade-700)" />
-                <rect x="4" y="24" width="24" height="4" rx="2" fill="var(--logo-shade-800)" />
+            <div className="flex items-center gap-0.5 mb-2">
+              <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-14 h-14 shrink-0">
+                <rect x="14" y="14" width="24" height="24" rx="8" fill="var(--logo-shade-200)" opacity="0.4"/>
+                <rect x="26" y="26" width="24" height="24" rx="8" fill="var(--logo-shade-700)"/>
+                <circle cx="20" cy="44" r="4" fill="var(--logo-shade-400)" opacity="0.8"/>
+                <circle cx="44" cy="20" r="4" fill="var(--logo-shade-600)" opacity="0.8"/>
               </svg>
               <h1 className="text-[28px] leading-none font-bold tracking-tight text-[var(--p-500)]" style={{ fontFamily: 'Sora, sans-serif' }}>ColorGen</h1>
             </div>
@@ -1403,7 +1404,14 @@ export default function App() {
             </div>
           </div>
           <div className="w-16 h-px bg-slate-200 dark:bg-slate-800 my-2"></div>
-          <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">ColorGen © 2026</p>
+          <div className="flex items-center gap-4">
+            <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">ColorGen © 2026</p>
+            <a href="https://x.com/ColorGenAi" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors" aria-label="Follow us on X">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+              </svg>
+            </a>
+          </div>
         </div>
       </footer>
 
